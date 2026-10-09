@@ -1,0 +1,53 @@
+/* ===== Simulator gerbang logika + gaya diagram SVG (simbol, rangkaian, saklar) ===== */
+.sim { max-width: 700px; margin: 0 auto; padding: 20px; border-radius: var(--radius); background: var(--plum); border: 2px solid var(--line); }
+.sim-tabs { display: flex; gap: 8px; justify-content: center; margin-bottom: 18px; }
+.sim-tabs[hidden] { display: none; }
+
+.sim-board { position: relative; display: grid; grid-template-columns: clamp(86px, 19%, 120px) 1fr clamp(76px, 17%, 110px); align-items: center; max-width: 620px; margin: 8px auto 4px; }
+.sim-ins { position: relative; align-self: stretch; }
+.sim-wires svg { display: block; width: 100%; height: auto; }
+.sw-btn { position: absolute; right: 0; transform: translateY(-50%); display: flex; align-items: center; gap: 8px; min-width: 86px; height: 46px; padding: 0 10px; border-radius: 999px; border: 3px solid var(--line); background: #3a2c3b; cursor: pointer; font-weight: 900; }
+.sw-btn .nm { font-size: 1.1em; }
+.sw-btn .knob { width: 20px; height: 20px; border-radius: 50%; background: #bda9c3; transition: transform .15s; }
+.sw-btn .val { min-width: 1ch; font-size: 1.15em; }
+.sw-btn.on { background: #1f5c42; border-color: var(--on); }
+.sw-btn.on .knob { background: var(--on); transform: translateX(2px); }
+.sw-btn:hover { border-color: var(--accent); }
+
+.sim-out { position: relative; display: flex; align-items: center; min-height: 60px; }
+.led { width: 58px; height: 58px; border-radius: 50%; background: #3a2c3b; border: 4px solid #7a6a80; transition: background .12s, box-shadow .12s; }
+.led.on { background: #7dffb6; border-color: #d6ffe8; box-shadow: 0 0 30px 10px rgba(108, 240, 168, .65); }
+.led-label { position: absolute; top: calc(50% + 38px); left: 0; display: flex; align-items: baseline; gap: 6px; white-space: nowrap; font-weight: 800; }
+.led-label small { color: var(--muted); font-weight: 600; }
+.led-label b { color: var(--gold); }
+
+.sim-eq { margin: 34px 0 6px; text-align: center; font-size: 1.35em; font-weight: 700; }
+.sim-eq b { color: var(--gold); }
+.sim .truth { margin: 10px auto; }
+.sim-task { margin-top: 14px; padding: .8em 1em; border-radius: 12px; background: rgba(255, 209, 102, .12); border-left: 6px solid var(--gold); }
+.sim-task.ok { background: rgba(108, 240, 168, .14); border-color: var(--on); }
+.sim-foot { display: flex; justify-content: center; margin-top: 16px; }
+.sim-foot[hidden] { display: none; }
+
+/* ----- SVG ----- */
+.sym-gate { width: min(260px, 100%); height: auto; }
+.sym-circuit { width: 100%; max-width: 660px; height: auto; }
+.sym-switches { width: min(430px, 100%); height: auto; }
+.sym-wire { fill: none; stroke: #bfa9c3; stroke-width: 4; stroke-linecap: round; stroke-linejoin: round; transition: stroke .12s; }
+.sym-wire.on { stroke: var(--on); } .sym-wire.off { stroke: #7a6a80; }
+.sym-body { fill: #3a2c3b; stroke: var(--cream); stroke-width: 3.5; stroke-linejoin: round; }
+.sym-txt { fill: var(--cream); font: 800 14px var(--font); } .sym-txt.sm { font-size: 12px; }
+.sym-id { fill: var(--muted); font: 700 11px var(--font); }
+.sym-in { fill: #3a2c3b; stroke: #7a6a80; stroke-width: 3; } .sym-in.on { fill: #1f5c42; stroke: var(--on); }
+.sym-badge { fill: #3a2c3b; stroke: var(--gold); stroke-width: 2; }
+.sym-lamp { fill: #3a2c3b; stroke: var(--cream); stroke-width: 3; }
+.sym-lamp.on { fill: #ffe27a; stroke: #fff2b8; filter: drop-shadow(0 0 8px #ffd166); } .sym-lamp.off { stroke: #7a6a80; }
+.sym-x { fill: none; stroke: #5a4a60; stroke-width: 3; stroke-linecap: round; }
+.sym-pin, .sw-pin { fill: var(--cream); }
+.sw-lever { fill: none; stroke: #bfa9c3; stroke-width: 5; stroke-linecap: round; transition: stroke .12s; } .sw-lever.on { stroke: var(--on); }
+.sw-hit { fill: transparent; }
+.sw.click { cursor: pointer; } .sw.click:focus-visible { outline: none; } .sw.click:focus-visible .sw-hit { stroke: var(--gold); stroke-width: 2; }
+.sw.click:hover .sw-hit { fill: rgba(255, 143, 171, .15); }
+.sw-info { margin: .6em 0 0; font-weight: 700; }
+
+@media (max-width: 520px) { .sim { padding: 14px 10px; } .sim-eq { font-size: 1.15em; } }

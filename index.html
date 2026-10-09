@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#2b2030">
+  <title>SirkuitRahasia — Novel Visual Rangkaian Logika</title>
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/visual-novel.css">
+  <link rel="stylesheet" href="css/simulation.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- MENU UTAMA -->
+  <section id="screen-menu" class="screen active" aria-label="Menu utama">
+    <div class="menu-bg"></div>
+    <div class="menu-chars" aria-hidden="true"></div>
+    <div class="menu-main">
+      <h1 class="logo"><span>Sirkuit</span>Rahasia</h1>
+      <p class="tagline">Novel visual belajar Rangkaian Logika</p>
+      <nav id="menu-list" class="menu-list" aria-label="Menu"></nav>
+      <p class="menu-foot">Ketuk atau klik apa saja untuk mengaktifkan suara.</p>
+    </div>
+  </section>
+
+  <!-- CERITA -->
+  <section id="screen-story" class="screen" aria-label="Cerita">
+    <div id="stage" class="stage">
+      <div id="bg-a" class="bg"></div><div id="bg-b" class="bg"></div>
+      <div id="sprites" class="sprites"></div>
+      <div class="vn-hud">
+        <span id="vn-chapter" class="vn-chapter"></span>
+        <button id="btn-pause" class="icon-btn" type="button" aria-label="Menu jeda">☰ Menu</button>
+      </div>
+      <div id="vn-choices" class="vn-choices" hidden></div>
+      <div id="dialogue" class="dialogue">
+        <div id="vn-name" class="namebox" hidden></div>
+        <p id="vn-text" class="vn-text" aria-live="polite"></p>
+        <span id="vn-next" class="vn-next" aria-hidden="true">▼</span>
+      </div>
+      <div id="fade" class="fade"></div>
+      <div id="pause" class="pause" hidden>
+        <div class="pause-box" role="dialog" aria-label="Jeda">
+          <h2>Jeda</h2>
+          <button class="btn primary" type="button" data-pause="resume">Lanjutkan</button>
+          <button class="btn" type="button" data-pause="settings">Pengaturan</button>
+          <button class="btn" type="button" data-pause="menu">Menu Utama</button>
+          <p class="small">Progres cerita tersimpan otomatis.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MATERI -->
+  <section id="screen-materials" class="screen panel-screen" aria-label="Materi">
+    <div class="backdrop"></div>
+    <header class="panel-head"><h2 id="mat-heading">Materi</h2><button id="mat-back" class="btn ghost small" type="button">← Menu</button></header>
+    <div id="mat-root" class="panel-body"></div>
+  </section>
+
+  <!-- SIMULASI -->
+  <section id="screen-sim" class="screen panel-screen" aria-label="Simulasi">
+    <div class="backdrop"></div>
+    <header class="panel-head"><h2 id="sim-heading">Simulasi Gerbang Logika</h2><button id="sim-back" class="btn ghost small" type="button">← Menu</button></header>
+    <div class="panel-body">
+      <p id="sim-intro" class="intro"></p>
+      <div id="sim-root"></div>
+      <div id="sim-foot" class="sim-foot" hidden><button id="sim-continue" class="btn primary" type="button" disabled>Lanjut Cerita ▶</button></div>
+    </div>
+  </section>
+
+  <!-- LATIHAN / EVALUASI -->
+  <section id="screen-eval" class="screen panel-screen" aria-label="Evaluasi">
+    <div class="backdrop"></div>
+    <header class="panel-head"><h2 id="eval-heading">Latihan</h2></header>
+    <div id="eval-root" class="panel-body"></div>
+  </section>
+
+  <!-- HASIL & PROGRES -->
+  <section id="screen-result" class="screen panel-screen" aria-label="Hasil dan progres">
+    <div class="backdrop"></div>
+    <header class="panel-head"><h2>Hasil &amp; Progres</h2><button id="res-back" class="btn ghost small" type="button">← Menu</button></header>
+    <div id="res-root" class="panel-body"></div>
+  </section>
+
+  <!-- PENGATURAN -->
+  <section id="screen-settings" class="screen panel-screen" aria-label="Pengaturan">
+    <div class="backdrop"></div>
+    <header class="panel-head"><h2>Pengaturan</h2><button id="set-back" class="btn ghost small" type="button">← Kembali</button></header>
+    <div id="set-root" class="panel-body"></div>
+  </section>
+
+</div>
+
+<!-- urutan penting: util → data → logika → modul → main -->
+<script src="js/util.js"></script>
+<script src="data/assets.js"></script>
+<script src="data/story.js"></script>
+<script src="data/materials.js"></script>
+<script src="data/questions.js"></script>
+<script src="js/logic.js"></script>
+<script src="js/symbols.js"></script>
+<script src="js/settings.js"></script>
+<script src="js/progress.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/dialogue.js"></script>
+<script src="js/simulation.js"></script>
+<script src="js/materials.js"></script>
+<script src="js/evaluation.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

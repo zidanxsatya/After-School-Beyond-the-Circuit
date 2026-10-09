@@ -1,0 +1,72 @@
+/* ===== Layar cerita (visual novel) ===== */
+#screen-story { background: #000; overflow: hidden; }
+.stage { position: absolute; inset: 0; overflow: hidden; container-type: size; user-select: none; -webkit-user-select: none; cursor: pointer;
+  --zoom: 128cqh; --maxw: 46cqw; --top: 3cqh; }
+
+/* latar: lapisan baru muncul di atas, yang lama memudar belakangan agar tidak ada kilatan hitam */
+.bg { position: absolute; inset: 0; background-size: cover; background-position: center; opacity: 0; z-index: 1; transition: opacity .5s ease .5s; }
+.bg.show { opacity: 1; z-index: 2; transition: opacity .5s ease; }
+.no-anim .bg { transition: none !important; }
+
+/* sprite: tinggi mengikuti kanvas asli (hf) agar skala antar karakter konsisten */
+.sprites { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.sprite { position: absolute; top: var(--top); aspect-ratio: var(--ar); height: min(calc(var(--hf) * var(--zoom)), calc(var(--maxw) / var(--ar)));
+  transform: translateX(-50%); z-index: 2; transition: left .45s ease, opacity .3s ease, filter .3s ease; filter: drop-shadow(0 6px 14px rgba(0,0,0,.35)); }
+.sprite.pos-left { left: 21%; } .sprite.pos-center { left: 50%; } .sprite.pos-right { left: 79%; }
+.sprite.dim { z-index: 1; filter: brightness(.7) saturate(.85) drop-shadow(0 6px 14px rgba(0,0,0,.3)); }
+.sprite.enter { animation: spriteIn .45s ease both; }
+.sprite.leaving { opacity: 0; }
+.sprite img { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity .22s ease; -webkit-user-drag: none; }
+.sprite img.in, .sprite img.old { opacity: 1; }
+@keyframes spriteIn { from { opacity: 0; transform: translateX(-50%) translateY(22px); } }
+
+/* HUD */
+.vn-hud { position: absolute; z-index: 6; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; gap: 10px;
+  padding: calc(10px + env(safe-area-inset-top)) 14px 0; pointer-events: none; }
+.vn-hud > * { pointer-events: auto; }
+.vn-chapter { padding: .25em .9em; border-radius: 999px; background: rgba(40, 28, 40, .7); font-size: .8em; font-weight: 700; pointer-events: none; }
+.vn-chapter:empty { display: none; }
+
+/* kotak dialog (terinspirasi tata letak Easy Ren'Py GUI: kotak plum transparan + nameplate di sudut kiri) */
+.dialogue { position: absolute; z-index: 5; left: 50%; transform: translateX(-50%); bottom: max(2.4cqh, env(safe-area-inset-bottom));
+  width: min(1120px, 94cqw); min-height: 26cqh; padding: 2.6em 2em 1.2em; border-radius: 18px;
+  background: rgba(54, 40, 52, .9); border: 2px solid rgba(255, 214, 232, .35); box-shadow: 0 10px 30px rgba(0,0,0,.4); backdrop-filter: blur(3px); }
+.vn-text { margin: 0; font-size: clamp(16px, 2.9cqh, 27px); line-height: 1.55; min-height: 3.1em; }
+.dialogue.narration { padding-top: 1.6em; background: rgba(30, 22, 34, .88); }
+.dialogue.narration .vn-text { font-style: italic; color: #f1e6ee; }
+.namebox { position: absolute; left: 22px; top: -1.35em; padding: .25em 1.3em .25em 1em; border-radius: 10px 10px 10px 0; background: #3a2a3a; border: 2px solid var(--c, #fff); border-left-width: 8px; font-weight: 900; font-size: clamp(16px, 2.8cqh, 26px); color: var(--cream); }
+.vn-next { position: absolute; right: 22px; bottom: 12px; opacity: 0; color: var(--accent); }
+.vn-next.show { opacity: 1; animation: bob 1s ease-in-out infinite; }
+@keyframes bob { 50% { transform: translateY(4px); } }
+
+/* pilihan jawaban */
+.vn-choices { position: absolute; z-index: 7; left: 50%; transform: translateX(-50%); bottom: calc(max(2.4cqh, 8px) + 30cqh); width: min(640px, 90cqw); display: flex; flex-direction: column; gap: 10px; cursor: default; }
+.vn-choices[hidden] { display: none; }
+.vn-choice { min-height: 52px; padding: .6em 1.2em; border-radius: 12px; border: 2px solid rgba(255, 214, 232, .5); background: rgba(73, 41, 53, .95); font-weight: 800; font-size: clamp(15px, 2.6cqh, 22px); cursor: pointer; }
+.vn-choice:hover:not(:disabled) { background: #6a3a4d; border-color: var(--accent); }
+.vn-choice.wrong { opacity: .5; text-decoration: line-through; cursor: not-allowed; }
+
+/* transisi adegan, kartu judul, jeda */
+.fade { position: absolute; inset: 0; z-index: 9; background: #0d0912; opacity: 0; pointer-events: none; display: flex; align-items: center; justify-content: center; }
+.title-card { text-align: center; animation: screenIn .8s ease both; }
+.title-card small { display: block; color: var(--accent); font-weight: 800; letter-spacing: .25em; text-transform: uppercase; }
+.title-card strong { display: block; margin-top: .3em; font-size: clamp(26px, 6cqw, 54px); }
+.pause { position: absolute; inset: 0; z-index: 10; background: rgba(13, 9, 18, .72); display: flex; align-items: center; justify-content: center; cursor: default; }
+.pause[hidden] { display: none; }
+.pause-box { width: min(340px, 86cqw); padding: 24px; border-radius: 18px; background: var(--plum-solid); border: 2px solid var(--line); display: grid; gap: 10px; text-align: center; }
+
+/* potret: layar sempit / tegak */
+@media (max-aspect-ratio: 1/1) {
+  .stage { --maxw: 66cqw; --top: 7cqh; --zoom: 120cqh; }
+  .sprite.pos-left { left: 27%; } .sprite.pos-right { left: 73%; }
+  .dialogue { min-height: 30cqh; padding: 2.4em 1.2em 1em; width: 96cqw; }
+  .vn-text { font-size: clamp(16px, 2.3cqh, 22px); }
+  .namebox { font-size: clamp(15px, 2.2cqh, 20px); }
+  .vn-choices { bottom: calc(max(2.4cqh, 8px) + 34cqh); }
+}
+/* layar landscape pendek (ponsel miring) */
+@media (max-height: 460px) and (min-aspect-ratio: 1/1) {
+  .dialogue { min-height: 38cqh; padding: 1.9em 1.4em .6em; } .vn-text { font-size: clamp(14px, 4.4cqh, 20px); min-height: 2.6em; }
+  .stage { --zoom: 112cqh; --top: 2cqh; }
+  .vn-choices { bottom: calc(40cqh + 8px); }
+}
