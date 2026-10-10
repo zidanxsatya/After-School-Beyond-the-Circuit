@@ -71,41 +71,52 @@
   function mount(root, opts) {
     const topics = SR.data.materials;
     let ti = Math.max(0, topics.findIndex(t => t.id === opts.topic)), pi = 0;
+    const whoOf = (t, p) => p.who || t.who;
 
-    function render() {
-      const t = topics[ti], p = t.pages[pi], last = pi === t.pages.length - 1;
-      const who = p.who || t.who;
-      root.innerHTML = `
-        <div class="mat">
-          ${opts.free ? `<nav class="mat-tabs" aria-label="Daftar materi">${topics.map((x, i) => `<button type="button" class="tab${i === ti ? ' active' : ''}" data-t="${i}">${esc(x.short || x.title)}</button>`).join('')}</nav>` : `<h2 class="mat-title">${esc(t.title)}</h2>`}
-          <div class="mat-page">
-            <aside class="mat-say">${portrait(who, p.exp)}<div class="bubble"><span class="who">${esc(SR.data.characters[who].name)}</span><p>${fmt(p.say)}</p></div></aside>
-            <article class="mat-body"><h3>${esc(p.title)}</h3>${(p.blocks || []).map(block).join('')}</article>
-          </div>
-          <footer class="mat-nav">
-            <button type="button" class="btn ghost" data-a="prev" ${pi === 0 ? 'disabled' : ''}>◀ Sebelumnya</button>
-            <span class="dots" aria-label="Halaman ${pi + 1} dari ${t.pages.length}">${t.pages.map((_, i) => `<i class="${i === pi ? 'on' : ''}"></i>`).join('')}</span>
-            <button type="button" class="btn primary" data-a="next">${last ? (opts.free ? (ti < topics.length - 1 ? 'Materi berikutnya ▶' : 'Selesai ✔') : 'Lanjut Cerita ▶') : 'Berikutnya ▶'}</button>
-          </footer>
-        </div>`;
+    // Kerangka (tab/judul) dibuat sekali per topik; hanya halaman & navigasi yang diganti saat pindah halaman.
+    function shell() {
+      const t = topics[ti];
+      root.innerHTML = `<div class="mat">
+        ${opts.free ? `<nav class="mat-tabs" aria-label="Daftar materi">${topics.map((x, i) => `<button type="button" class="tab${i === ti ? ' active' : ''}" data-t="${i}">${esc(x.short || x.title)}</button>`).join('')}</nav>` : `<h2 class="mat-title">${esc(t.title)}</h2>`}
+        <div class="mat-page"></div>
+        <footer class="mat-nav"></footer></div>`;
+    }
+
+    // Hangatkan potret halaman sebelum/sesudahnya (hanya 2 gambar) agar pergantian tidak berkedip.
+    function warm() {
+      const t = topics[ti];
+      [pi - 1, pi + 1].forEach(j => { const p = t.pages[j]; if (p) SR.Sprites.preload(whoOf(t, p), p.exp || SR.data.characters[whoOf(t, p)].default); });
+      if (pi === t.pages.length - 1 && topics[ti + 1]) { const n = topics[ti + 1], p = n.pages[0]; SR.Sprites.preload(whoOf(n, p), p.exp || SR.data.characters[whoOf(n, p)].default); }
+    }
+
+    function page() {
+      const t = topics[ti], p = t.pages[pi], last = pi === t.pages.length - 1, who = whoOf(t, p);
+      root.querySelector('.mat-page').innerHTML =
+        `<aside class="mat-say">${portrait(who, p.exp)}<div class="bubble"><span class="who">${esc(SR.data.characters[who].name)}</span><p>${fmt(p.say)}</p></div></aside>
+         <article class="mat-body"><h3>${esc(p.title)}</h3>${(p.blocks || []).map(block).join('')}</article>`;
+      root.querySelector('.mat-nav').innerHTML =
+        `<button type="button" class="btn ghost" data-a="prev" ${pi === 0 ? 'disabled' : ''}>◀ Sebelumnya</button>
+         <span class="dots" aria-label="Halaman ${pi + 1} dari ${t.pages.length}">${t.pages.map((_, i) => `<i class="${i === pi ? 'on' : ''}"></i>`).join('')}</span>
+         <button type="button" class="btn primary" data-a="next">${last ? (opts.free ? (ti < topics.length - 1 ? 'Materi berikutnya ▶' : 'Selesai ✔') : 'Lanjut Cerita ▶') : 'Berikutnya ▶'}</button>`;
       wireInteractive(root);
       if (last) SR.Progress.markMaterial(t.id);
-      const body = root.querySelector('.mat-body'); if (body) body.scrollTop = 0;
+      root.querySelectorAll('.tab').forEach((b, i) => b.classList.toggle('active', i === ti));
+      warm();
     }
 
     root.onclick = e => {
       const tab = e.target.closest('[data-t]');
-      if (tab) { ti = +tab.dataset.t; pi = 0; return render(); }
+      if (tab) { ti = +tab.dataset.t; pi = 0; return page(); }
       const a = e.target.closest('[data-a]');
       if (!a) return;
-      if (a.dataset.a === 'prev' && pi > 0) { pi--; render(); }
+      if (a.dataset.a === 'prev' && pi > 0) { pi--; page(); }
       else if (a.dataset.a === 'next') {
-        if (pi < topics[ti].pages.length - 1) { pi++; render(); }
-        else if (opts.free && ti < topics.length - 1) { ti++; pi = 0; render(); }
+        if (pi < topics[ti].pages.length - 1) { pi++; page(); }
+        else if (opts.free && ti < topics.length - 1) { ti++; pi = 0; page(); }
         else opts.onDone && opts.onDone();
       }
     };
-    render();
+    shell(); page();
   }
 
   SR.Materials = { mount };

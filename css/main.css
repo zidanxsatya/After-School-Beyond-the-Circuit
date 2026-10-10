@@ -54,7 +54,8 @@ code { background: rgba(255,255,255,.12); padding: 0 .3em; border-radius: 4px; }
 
 /* ----- layar panel (materi, simulasi, evaluasi, hasil, pengaturan) ----- */
 .panel-screen { overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
-.backdrop { position: fixed; inset: -20px; background-size: cover; background-position: center; filter: blur(7px) brightness(.5); z-index: 0; }
+.backdrop { position: fixed; inset: -20px; background-size: cover; background-position: center; filter: blur(7px) brightness(.5); z-index: 0;
+  will-change: transform; transform: translateZ(0); }   /* lapisan GPU sendiri: blur dihitung sekali, bukan tiap frame (tanpa ini frame turun ± 3x di HP) */
 .panel-head, .panel-body { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; }
 .panel-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: max(14px, env(safe-area-inset-top)) 18px 8px; }
 .panel-head h2 { font-size: clamp(20px, 3vw, 28px); }
@@ -187,3 +188,4 @@ code { background: rgba(255,255,255,.12); padding: 0 .3em; border-radius: 4px; }
   .menu-list { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; } .menu-btn { min-height: 38px; font-size: .95em; padding: .2em .8em; }
   .menu-list .primary:first-child { grid-column: 1 / -1; }
 }
+.quip { color: var(--muted); font-style: italic; }

@@ -90,7 +90,7 @@
       walk_shoes: 'assets/audio/sfx/walk_shoes.mp3',
     },
     // Suara antarmuka -> id efek di atas
-    ui: { click: 'ui_confirm', toggle: 'switch', correct: 'quiz_correct', wrong: 'quiz_wrong', scene: 'scene_change', unlock: 'door_open' },
+    ui: { click: 'ui_confirm', toggle: 'switch', correct: 'quiz_correct', wrong: 'quiz_wrong', scene: 'scene_change', unlock: 'twinkle' },
     // Skala volume khusus suara latar (ambience) relatif terhadap volume efek
     ambientGain: 0.5
   };

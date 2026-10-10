@@ -45,22 +45,41 @@
     if (unlocked) return;
     unlocked = true;
     sync('bgm'); sync('amb');
+    preload(Object.values(D().ui));
   }
   ['pointerdown', 'keydown', 'touchstart'].forEach(e => window.addEventListener(e, unlock, { once: false, passive: true }));
 
-  function sfx(id) {
+  // Efek suara: satu elemen Audio per id, dibuat sekali lalu dipakai ulang (tanpa unduh/dekode ulang).
+  // Efek yang sama dimulai dari awal (tidak bertumpuk). Klik UI ditahan bila ada efek lain yang baru saja mulai.
+  const pool = new Map();
+  let lastAt = 0;
+  function el(id) {
+    let a = pool.get(id);
+    if (!a) {
+      const f = D().sfx[id];
+      if (!f) { console.warn('[audio] sfx tidak dikenal:', id); return null; }
+      a = new Audio(f); a.preload = 'auto'; pool.set(id, a);
+    }
+    return a;
+  }
+  function sfx(id, opt) {
     const v = S().get('sfxMute') ? 0 : S().get('sfxVol');
     if (!unlocked || v <= 0) return;
-    const f = D().sfx[id];
-    if (!f) { console.warn('[audio] sfx tidak dikenal:', id); return; }
-    const a = new Audio(f); a.volume = v; a.play().catch(() => {});
+    const now = performance.now();
+    if (opt && opt.soft && now - lastAt < 150) return;      // klik UI tidak menumpuk di atas efek lain
+    const a = el(id); if (!a) return;
+    lastAt = now; a.volume = v;
+    try { a.currentTime = 0; } catch (e) { /* belum siap, abaikan */ }
+    a.play().catch(() => {});
   }
+  // Panaskan efek yang pasti dipakai (UI) agar klik pertama tidak terlambat.
+  const preload = ids => ids.forEach(id => el(id));
 
   SR.Audio = {
     bgm(id) { want.bgm = id || null; sync('bgm'); },
     amb(id) { want.amb = id || null; sync('amb'); },
-    sfx,
-    ui(name) { const id = D().ui[name]; if (id) sfx(id); },
+    sfx, preload,
+    ui(name, opt) { const id = D().ui[name]; if (id) sfx(id, opt); },
     current: () => ({ bgm: ch.bgm.id, amb: ch.amb.id })
   };
   S().onChange(() => { apply('bgm'); apply('amb'); });

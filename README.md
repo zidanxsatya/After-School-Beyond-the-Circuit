@@ -23,7 +23,7 @@ Menu → **Cerita** (Bab 1) → materi → simulasi (3 kunci) → evaluasi akhir
 ```
 index.html            kerangka halaman & urutan skrip
 css/   main.css (dasar, menu, materi, evaluasi)  visual-novel.css (layar cerita)  simulation.css (simulator & diagram)
-js/    util  logic (hitungan gerbang)  symbols (gambar SVG)  settings  progress  audio
+js/    util  logic (hitungan gerbang)  symbols (gambar SVG)  settings  progress  audio  sprites (cache sprite)
        dialogue (mesin cerita)  simulation  materials (penampil)  evaluation  main (navigasi)
 data/  assets.js (karakter, ekspresi, latar, audio)  story.js  materials.js  questions.js
 assets/ characters/<rena|pia|sera>/*.webp   backgrounds/*.webp   audio/bgm/*.mp3   audio/sfx/*.mp3   ASSET_MAP.md
@@ -70,6 +70,7 @@ Daftar ekspresi yang tersedia ada di `data/assets.js`; asal tiap nama ada di `as
 - Latar: taruh `assets/backgrounds/nama.webp`, daftarkan di `SR.data.backgrounds` (`data/assets.js`), pakai `bg: 'nama'`.
 - Musik latar: `assets/audio/bgm/nama.mp3`, daftarkan di `SR.data.audio.bgm`, pakai `bgm: 'nama'` (di adegan atau baris). `bgm: null` menghentikan musik. Suara latar (angin, dll.) lewat `amb: 'id_sfx'`.
 - Efek suara: `assets/audio/sfx/nama.mp3`, daftarkan di `SR.data.audio.sfx`, pakai `sfx: 'nama'`. Suara klik/benar/salah diatur di `SR.data.audio.ui`.
+- **Aturan audio:** efek suara dalam cerita dipakai hanya untuk kejadian yang tampak di layar (kemunculan karakter, reaksi, kunci terbuka, pintu). Suara latar berulang (`amb`) tersedia di mesin tetapi **tidak dipakai** secara bawaan, supaya tidak menutupi dialog; pakai hanya bila adegannya memang membutuhkannya. Efek yang sama tidak bertumpuk (dimulai ulang), dan klik UI ditahan bila ada efek lain yang baru saja mulai.
 - Audio baru dimulai setelah klik/ketuk pertama (aturan browser). Musik berulang (loop) memakai MP3 sehingga mungkin ada jeda sangat singkat saat mengulang.
 
 ## Mengedit materi (`data/materials.js`)

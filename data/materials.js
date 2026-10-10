@@ -43,7 +43,7 @@
             { t: 'table', gate: 'AND', caption: 'Hanya satu baris yang menghasilkan 1.' }
           ] },
         { title: 'Analogi: saklar seri', who: 'rena', exp: 'thinking',
-          say: 'Bayangkan dua saklar disambung berderet ke satu lampu. Arus hanya lewat kalau keduanya tertutup!',
+          say: 'Coba telusuri jalur arusnya. Dua saklar berderet menuju satu lampu, jadi arus cuma sampai kalau keduanya tertutup. Satu saja terbuka, jejaknya putus di situ!',
           blocks: [
             { t: 'switches', mode: 'series', caption: 'Dua saklar **seri** = AND. Ketuk saklar untuk membuka/menutup.' }
           ] },
@@ -71,7 +71,7 @@
             { t: 'table', gate: 'OR', caption: 'Hanya satu baris yang menghasilkan 0.' }
           ] },
         { title: 'Analogi: saklar paralel', who: 'rena', exp: 'confident',
-          say: 'Sekarang dua saklar dipasang bercabang. Cukup satu jalan terbuka, arus sudah sampai ke lampu.',
+          say: 'Sekarang jalurnya bercabang. Arus punya dua jalan, jadi cukup satu saklar tertutup dan lampu menyala. Tadi aku sempat mengira keduanya harus tertutup… itu kan aturan AND, hehe.',
           blocks: [
             { t: 'switches', mode: 'parallel', caption: 'Dua saklar **paralel** = OR. Ketuk saklar untuk membuka/menutup.' }
           ] },
@@ -123,7 +123,7 @@
             { t: 'p', text: 'Membaca tabel: pilih satu baris, lihat nilai A dan B, lalu baca Y di kolom gerbang yang dimaksud.' }
           ] },
         { title: 'Hubungan input dan output', who: 'rena', exp: 'thinking',
-          say: 'Intinya: output tidak acak. Untuk input yang sama, gerbang yang sama selalu memberi output yang sama.',
+          say: 'Polanya sudah kelihatan: output tidak pernah acak. Input yang sama pada gerbang yang sama selalu menghasilkan output yang sama, jadi tabel ini bisa jadi bukti kita.',
           blocks: [
             { t: 'list', items: ['**AND**: output 1 hanya jika **semua** input 1.', '**OR**: output 1 jika **minimal satu** input 1.', '**NOT**: output adalah **kebalikan** input.'] },
             { t: 'callout', kind: 'tip', text: 'Ragu pada suatu jawaban? Tulis tabelnya, lalu cari barisnya.' }
@@ -141,7 +141,7 @@
               caption: 'Contoh: A = 1 dan B = 1 masuk ke AND (hasil 1), lalu dibalik oleh NOT menjadi 0.' }
           ] },
         { title: 'Latihan membaca satu rangkaian lagi', who: 'rena', exp: 'confident',
-          say: 'Tidak ada trik rahasia. Hitung gerbang demi gerbang, dan tuliskan hasil antaranya.',
+          say: 'Tidak perlu menebak. Hitung gerbang demi gerbang dari kiri, tulis hasil antaranya, dan kesimpulannya muncul sendiri. Awas, jangan melompat langsung ke NOT-nya!',
           blocks: [
             { t: 'circuit', net: { inputs: ['A', 'B'], gates: [{ id: 'g1', type: 'OR', in: ['A', 'B'] }, { id: 'g2', type: 'NOT', in: ['g1'] }], out: 'g2' }, inputs: { A: 0, B: 0 },
               caption: 'A = 0, B = 0 → OR menghasilkan 0 → NOT membaliknya menjadi 1.' }

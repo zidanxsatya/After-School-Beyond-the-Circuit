@@ -4,7 +4,7 @@
   const SR = window.SR = window.SR || {};
   const { fmt, $, $$, wait } = SR.Util;
   const CH = id => SR.data.characters[id];
-  const GUARD_MS = 220;          // abaikan ketukan ganda yang terlalu cepat
+  const GUARD_MS = 160;          // abaikan ketukan ganda yang terlalu cepat
 
   let host, el = {}, st = null, busy = false, askActive = false, waiting = false, typing = null, lastAdv = 0, bgFlip = false;
 
@@ -26,13 +26,13 @@
       return { vis, hid, full };
     });
     const total = parts.reduce((a, p) => a + p.full.length, 0);
-    let raf = 0, finished = false, resolve;
+    let raf = 0, finished = false, resolve, last = -1;
     const done = new Promise(r => { resolve = r; });
     const paint = shown => { let left = shown; parts.forEach(p => { const k = Math.min(left, p.full.length); left -= k; p.vis.nodeValue = p.full.slice(0, k); p.hid.textContent = p.full.slice(k); }); };
     const finish = () => { if (finished) return; finished = true; cancelAnimationFrame(raf); parts.forEach(p => { p.vis.nodeValue = p.full; p.hid.remove(); }); resolve(); };
     const t0 = performance.now();
     if (!(cps > 0)) finish();
-    else { const tick = now => { if (finished) return; const shown = Math.floor((now - t0) / 1000 * cps); if (shown >= total) finish(); else { paint(shown); raf = requestAnimationFrame(tick); } }; raf = requestAnimationFrame(tick); }
+    else { const tick = now => { if (finished) return; const shown = Math.floor((now - t0) / 1000 * cps); if (shown >= total) finish(); else { if (shown !== last) { last = shown; paint(shown); } raf = requestAnimationFrame(tick); } }; raf = requestAnimationFrame(tick); }
     return { finish, done, cancel() { finished = true; cancelAnimationFrame(raf); } };
   }
 
@@ -73,17 +73,20 @@
 
   function setExpImg(n, id, exp, instant) {
     const cur = n.querySelector('img.cur');
-    if (cur && cur.dataset.exp === exp) return;
-    const img = new Image();
-    img.className = 'cur'; img.alt = ''; img.draggable = false; img.dataset.exp = exp;
-    img.src = CH(id).dir + exp + '.webp';
+    if (cur && cur.dataset.exp === exp) { n.dataset.want = exp; return; }
+    n.dataset.want = exp;
+    const it = SR.Sprites.get(id, exp);           // dari cache bila sudah dipanaskan
     const attach = () => {
-      if (cur) { cur.classList.remove('cur'); cur.classList.add('old'); }
+      if (n.dataset.want !== exp || !n.isConnected) return;   // sudah diganti ekspresi lain
+      const prev = n.querySelector('img.cur');
+      const img = it.img.cloneNode(false);
+      img.className = 'cur'; img.alt = ''; img.draggable = false; img.dataset.exp = exp;
+      if (prev) { prev.classList.remove('cur'); prev.classList.add('old'); }
       n.appendChild(img);
       requestAnimationFrame(() => img.classList.add('in'));
-      setTimeout(() => $$('img.old', n).forEach(o => o.remove()), instant ? 0 : 260);
+      setTimeout(() => $$('img.old', n).forEach(o => o.remove()), instant ? 0 : 180);
     };
-    (img.decode ? img.decode() : Promise.reject()).then(attach, attach);
+    if (it.ready) attach(); else it.p.then(attach);
   }
 
   function renderSprites(instant) {
@@ -111,6 +114,25 @@
     if (!silent && line.sfx) SR.Audio.sfx(line.sfx);
   }
 
+  /* ---------- pemanasan (preload) sprite & latar yang segera dipakai ---------- */
+  function warmLines(lines, from, count) {
+    for (let j = from; j < Math.min(lines.length, from + count); j++) {
+      const l = lines[j]; if (!l) break;
+      if (l.who) SR.Sprites.preload(l.who, l.exp);
+      (l.show || []).forEach(s => SR.Sprites.preload(s.id, s.exp));
+      if (l.action === 'ask') { SR.Sprites.preload(l.who, l.right.exp); SR.Sprites.preload(l.who, l.wrong.exp); }
+      if (l.bg) SR.Sprites.preloadBg(l.bg);
+      if (l.action === 'material') {                       // potret halaman pertama materi yang akan dibuka
+        const t = SR.data.materials.find(m => m.id === l.id), p = t && t.pages[0];
+        if (p) SR.Sprites.preload(p.who || t.who, p.exp);
+      }
+    }
+  }
+  function warmNextScene(sc) {
+    const nx = sc.next && SR.data.story.scenes[sc.next];
+    if (!nx) return; SR.Sprites.preloadBg(nx.bg); warmLines(nx.lines, 0, 4);
+  }
+
   /* ---------- tampilan teks ---------- */
   function showText(line) {
     const ch = line.who ? CH(line.who) : null;
@@ -128,6 +150,7 @@
     const sc = st.scene, line = sc.lines[st.idx];
     if (!line) return endScene();
     host.onCheckpoint(st.sceneId, st.idx);
+    warmLines(sc.lines, st.idx + 1, 4);
     if (line.action === 'ask') return runAsk(line);
     if (line.action) { busy = true; return host.runAction(line, () => { busy = false; st.idx++; showLine(); }); }
     applyLine(line, false); renderSprites(false); showText(line);
@@ -167,7 +190,8 @@
     if (!sc) throw new Error('Adegan tidak ditemukan: ' + id);
     busy = true; st.scene = sc; st.sceneId = id; st.idx = 0;
     const silent = resumeIdx != null;
-    if (!silent) { await fadeTo(1, 350); SR.Audio.ui('scene'); }
+    const newPlace = !st.bg || sc.bg !== st.bg;       // suara transisi hanya saat tempat berganti
+    if (!silent) { await fadeTo(1, 250); if (newPlace) SR.Audio.ui('scene'); }
     resetStage();
     el.chapter.textContent = sc.chapter || '';
     st.bg = null; setBg(sc.bg, true);
@@ -179,11 +203,11 @@
     } else {
       if (sc.card) {
         el.fade.innerHTML = `<div class="title-card"><small>${fmt(sc.card.top)}</small><strong>${fmt(sc.card.title)}</strong></div>`;
-        SR.Audio.sfx('sting'); await wait(2000); el.fade.innerHTML = '';
-      } else await wait(150);
-      await fadeTo(0, 450);
+        SR.Audio.sfx('sting'); await wait(1800); el.fade.innerHTML = '';
+      } else await wait(60);
+      await fadeTo(0, 300);
     }
-    busy = false; showLine();
+    busy = false; showLine(); warmNextScene(sc);
   }
 
   function endScene() {

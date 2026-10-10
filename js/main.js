@@ -45,7 +45,7 @@
 
   /* ---------- cerita ---------- */
   SR.Dialogue.init({
-    onCheckpoint: (s, i) => SR.Progress.setCheckpoint(s, i),
+    onCheckpoint: (s, i) => setTimeout(() => SR.Progress.setCheckpoint(s, i), 0),   // tulis simpanan di luar jalur render
     onEnd: () => { SR.Progress.finishStory(); toMenu(); },
     runAction(line, done) {
       if (line.action === 'material') openMaterials(line.id, false, done);
@@ -77,7 +77,7 @@
     const tag = e.target.tagName;
     if ((e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowRight') && tag !== 'BUTTON') { e.preventDefault(); SR.Dialogue.advance(); }
   });
-  document.addEventListener('click', e => { if (e.target.closest('.btn, .icon-btn, .tab')) SR.Audio.ui('click'); }, true);
+  document.addEventListener('click', e => { if (e.target.closest('.btn, .icon-btn, .tab') && !e.target.closest('[data-a="check"]')) SR.Audio.ui('click', { soft: true }); }, true);   // "Periksa jawaban" punya suara benar/salah sendiri
 
   /* ---------- materi ---------- */
   function openMaterials(topic, free, onDone) {

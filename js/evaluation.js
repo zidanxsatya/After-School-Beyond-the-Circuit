@@ -42,9 +42,10 @@
     }
   }
 
+  // [karakter, ekspresi, komentar singkat] — komentar tidak memuat jawaban teknis, hanya gaya bicara tiap karakter
   const REACT = {
-    right: [['pia', 'grin'], ['rena', 'happy'], ['sera', 'smile'], ['pia', 'sparkle']],
-    wrong: [['rena', 'thinking'], ['pia', 'troubled'], ['sera', 'normal2'], ['rena', 'concerned']]
+    right: [['pia', 'grin', 'Yeay, benar!'], ['rena', 'happy', 'Deduksiku cocok dengan jawabannya. Semua petunjuk nyambung!'], ['sera', 'smile', 'Tepat.'], ['pia', 'sparkle', 'Kamu keren!']],
+    wrong: [['rena', 'thinking', 'Ada petunjuk yang kulewatkan. Ayo telusuri lagi dari aturannya.'], ['pia', 'troubled', 'Aduh, hampir! Tenang, kita cek bareng.'], ['sera', 'normal2', 'Belum. Periksa aturannya sekali lagi.'], ['rena', 'concerned', 'Hmm, kesimpulanku tadi terlalu cepat. Kita cek ulang.']]
   };
   const pick = a => a[Math.floor(Math.random() * a.length)];
 
@@ -95,11 +96,11 @@
       root.querySelectorAll('.opt').forEach((o, k) => { o.disabled = true; if (k === b.correct) o.classList.add('right'); else if (k === picked) o.classList.add('wrong'); });
       root.querySelectorAll('.cell').forEach((c, k) => { c.disabled = true; c.classList.add(cells[k] === b.correct[k] ? 'right' : 'wrong'); c.textContent = cells[k]; if (cells[k] !== b.correct[k]) c.insertAdjacentHTML('afterend', `<span class="fix">→ ${b.correct[k]}</span>`); });
 
-      const [who, exp] = pick(ok ? REACT.right : REACT.wrong), ch = SR.data.characters[who];
+      const [who, exp, quip] = pick(ok ? REACT.right : REACT.wrong), ch = SR.data.characters[who];
       const explain = [q.explain, b.auto].filter(Boolean).map(fmt).join(' ');
       root.querySelector('.ev-feedback').innerHTML =
         `<div class="fb ${ok ? 'ok' : 'bad'}">${SR.Util.portrait(who, exp)}` +
-        `<div><strong>${ok ? 'Benar!' : 'Belum tepat.'}</strong>${ok ? '' : ` Jawaban yang benar: <b>${esc(correctText)}</b>.`}<p>${explain}</p></div></div>`;
+        `<div><em class="quip">${esc(ch.name)}: “${esc(quip)}”</em><br><strong>${ok ? 'Benar!' : 'Belum tepat.'}</strong>${ok ? '' : ` Jawaban yang benar: <b>${esc(correctText)}</b>.`}<p>${explain}</p></div></div>`;
       const btn = root.querySelector('[data-a="check"]'); btn.dataset.a = 'next'; btn.textContent = i === qs.length - 1 ? 'Lihat hasil ▶' : 'Soal berikutnya ▶'; btn.disabled = false; btn.focus({ preventScroll: true });
     }
 
