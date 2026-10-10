@@ -1,4 +1,6 @@
-# SirkuitRahasia
+# After School: Beyond the Circuit
+
+> Nama proyek sebelumnya: *SirkuitRahasia*. Kunci penyimpanan browser (`sirkuitrahasia.*`) sengaja **tidak** diganti agar progres pemain yang sudah tersimpan tidak hilang.
 
 Novel visual edukasi (web, HTML + CSS + JavaScript murni) untuk belajar **Rangkaian Logika**: bilangan biner, gerbang AND / OR / NOT, tabel kebenaran, dan membaca rangkaian sederhana. Bahasa: Indonesia.
 
@@ -88,7 +90,7 @@ Tambahkan satu objek ke daftar. Jenis: `mc` (pilihan ganda; pilihan diacak saat 
 ## Menyiapkan untuk GitHub (manual)
 
 1. **Baca dulu `LICENSES_AND_ATTRIBUTION.md`.** Izin redistribusi hampir semua aset (karakter, latar, musik, efek suara) belum terbukti. Putuskan berkas mana yang boleh publik; folder `assets/` bisa ditahan.
-2. Unggah isi folder `SirkuitRahasia/` (bukan folder pembungkusnya) ke repositori. Gunakan huruf besar/kecil nama berkas persis seperti sekarang (GitHub Pages peka huruf besar/kecil).
+2. Unggah isi folder proyek (bukan folder pembungkusnya) ke repositori. Gunakan huruf besar/kecil nama berkas persis seperti sekarang (GitHub Pages peka huruf besar/kecil).
 3. Semua path bersifat relatif, jadi bisa ditaruh di akar repositori atau subfolder.
 4. Ukuran proyek sekitar 32 MB; masing-masing berkas jauh di bawah batas 100 MB GitHub.
 

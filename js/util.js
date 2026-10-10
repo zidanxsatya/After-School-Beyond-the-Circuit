@@ -7,5 +7,11 @@
   const $ = (sel, root) => (root || document).querySelector(sel);
   const $$ = (sel, root) => Array.from((root || document).querySelectorAll(sel));
   const wait = ms => new Promise(r => setTimeout(r, ms));
-  SR.Util = { esc, fmt, $, $$, wait };
+  // Kotak potret persegi: jendela wajah per karakter (data/assets.js -> portrait), rasio gambar tidak diubah.
+  // Ukuran diatur CSS lewat variabel --ps (mis. style="--ps:140px") atau kelas pembungkus.
+  const portrait = (who, exp, cls) => {
+    const c = SR.data.characters[who], p = c.portrait || { x: 0, w: 1 };
+    return `<div class="portrait ${cls || ''}" style="--c:${c.color}"><img src="${c.dir}${exp || c.default}.webp" alt="${esc(c.name)}" style="width:${(100 / p.w).toFixed(2)}%;left:-${(p.x / p.w * 100).toFixed(2)}%"></div>`;
+  };
+  SR.Util = { esc, fmt, $, $$, wait, portrait };
 })();

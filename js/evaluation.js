@@ -98,7 +98,7 @@
       const [who, exp] = pick(ok ? REACT.right : REACT.wrong), ch = SR.data.characters[who];
       const explain = [q.explain, b.auto].filter(Boolean).map(fmt).join(' ');
       root.querySelector('.ev-feedback').innerHTML =
-        `<div class="fb ${ok ? 'ok' : 'bad'}"><div class="portrait" style="--c:${ch.color}"><img src="${ch.dir}${exp}.webp" alt="${esc(ch.name)}"></div>` +
+        `<div class="fb ${ok ? 'ok' : 'bad'}">${SR.Util.portrait(who, exp)}` +
         `<div><strong>${ok ? 'Benar!' : 'Belum tepat.'}</strong>${ok ? '' : ` Jawaban yang benar: <b>${esc(correctText)}</b>.`}<p>${explain}</p></div></div>`;
       const btn = root.querySelector('[data-a="check"]'); btn.dataset.a = 'next'; btn.textContent = i === qs.length - 1 ? 'Lihat hasil ▶' : 'Soal berikutnya ▶'; btn.disabled = false; btn.focus({ preventScroll: true });
     }

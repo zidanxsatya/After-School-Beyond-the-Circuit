@@ -135,7 +135,7 @@
       const weak = Object.keys(res.byTopic).filter(t => res.byTopic[t].right < res.byTopic[t].total);
       html += `<section class="res-card ${r ? 'fresh' : ''}">
         <div class="res-score"><b>${res.score}</b><span>/ ${res.total}</span><small>${res.percent}%</small></div>
-        <div class="res-msg"><h3>${title}</h3><div class="fb ok"><div class="portrait" style="--c:${ch.color}"><img src="${ch.dir}${exp}.webp" alt="${esc(ch.name)}"></div><div><strong>${ch.name}</strong><p>${msg}</p></div></div></div>
+        <div class="res-msg"><h3>${title}</h3><div class="fb ok">${SR.Util.portrait(who, exp)}<div><strong>${ch.name}</strong><p>${msg}</p></div></div></div>
         <table class="truth static topics"><thead><tr><th>Topik</th><th>Benar</th></tr></thead><tbody>${Object.keys(res.byTopic).map(t => {
           const m = mats.find(x => x.id === t), s = res.byTopic[t];
           return `<tr><td>${esc(m ? m.short : t)}</td><td class="y">${s.right} / ${s.total} ${s.right === s.total ? '✓' : ''}</td></tr>`;
@@ -189,5 +189,5 @@
 
   /* ---------- mulai ---------- */
   buildMenu(); SR.Audio.bgm('everyday_life');
-  window.addEventListener('error', e => console.error('[SirkuitRahasia]', e.message));
+  window.addEventListener('error', e => console.error('[After School: Beyond the Circuit]', e.message));
 })();

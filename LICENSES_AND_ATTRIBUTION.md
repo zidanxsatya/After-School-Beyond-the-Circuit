@@ -1,4 +1,4 @@
-# Lisensi dan Atribusi — SirkuitRahasia
+# Lisensi dan Atribusi — After School: Beyond the Circuit
 
 > **Penting untuk Master sebelum mengunggah ke GitHub publik.** Di dalam semua arsip aset yang diterima **tidak ditemukan berkas lisensi, README sumber, atau catatan atribusi** (kecuali dari Easy Ren'Py GUI, lihat bawah). Karena itu **izin redistribusi publik hampir semua aset BELUM TERBUKTI**. Dokumen ini hanya mencatat apa yang benar-benar diketahui; tidak ada aset yang saya nyatakan "aman".
 

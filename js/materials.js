@@ -5,10 +5,7 @@
   const { fmt, esc } = SR.Util;
   const L = () => SR.Logic;
 
-  const portrait = (who, exp) => {
-    const c = SR.data.characters[who];
-    return `<div class="portrait" style="--c:${c.color}"><img src="${c.dir}${exp || c.default}.webp" alt="${esc(c.name)}"></div>`;
-  };
+  const portrait = SR.Util.portrait;
 
   function tableHtml(gate) {
     const one = L().GATES[gate].arity === 1;
@@ -37,7 +34,7 @@
       case 'gate': return `<figure class="fig">${SR.Symbols.gate(b.gate)}<figcaption>${fmt(b.caption || '')}</figcaption></figure>`;
       case 'table': return `<figure class="fig">${tableHtml(b.gate)}${b.caption ? `<figcaption>${fmt(b.caption)}</figcaption>` : ''}</figure>`;
       case 'compare': return `<figure class="fig">${compareHtml(b.gates)}${b.caption ? `<figcaption>${fmt(b.caption)}</figcaption>` : ''}</figure>`;
-      case 'grid': return `<table class="truth static grid"><thead><tr>${b.head.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${b.rows.map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+      case 'grid': return `<div class="tbl-wrap"><table class="truth static grid"><thead><tr>${b.head.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${b.rows.map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
       case 'bitdemo': return `<div class="bitdemo" data-bit="0"><button type="button" class="bit-btn" aria-pressed="false"></button><div class="bulb" aria-hidden="true"></div><p class="bit-txt"></p></div>`;
       case 'switches': return `<figure class="fig sw-fig" data-mode="${b.mode}" data-state="0,0">${SR.Symbols.switches(b.mode, [0, 0], { interactive: true })}<figcaption>${fmt(b.caption || '')}</figcaption><p class="sw-info" aria-live="polite"></p></figure>`;
       case 'circuit': return `<figure class="fig">${SR.Symbols.circuit(b.net, b.inputs, { values: true })}${stepsHtml(b.net, b.inputs)}${b.caption ? `<figcaption>${fmt(b.caption)}</figcaption>` : ''}</figure>`;

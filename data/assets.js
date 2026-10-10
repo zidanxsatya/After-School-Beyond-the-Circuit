@@ -5,13 +5,14 @@
   const SR = window.SR = window.SR || {};
   SR.data = SR.data || {};
 
+  // portrait = jendela wajah (x = tepi kiri, w = lebar, pecahan lebar gambar; mulai dari atas gambar) untuk kotak potret persegi.
   // ar = lebar/tinggi sprite, hf = tinggi sprite / tinggi kanvas asli (3000 px) -> menjaga skala antar karakter.
   SR.data.characters = {
-    rena: { name: 'Rena', role: 'Detektif', color: '#e58aa8', dir: 'assets/characters/rena/', ar: 0.5807, hf: 0.9460, default: 'normal',
+    rena: { name: 'Rena', role: 'Detektif', color: '#e58aa8', dir: 'assets/characters/rena/', ar: 0.5807, hf: 0.9460, portrait: { x: 0.225, w: 0.55 }, default: 'normal',
       expressions: ['angry', 'angry2', 'awkward', 'blushing', 'calm', 'cheerful', 'concerned', 'confident', 'disappointed', 'displeased', 'embarrassed', 'eyes_closed_laugh', 'eyes_closed_smile', 'flustered', 'frustrated', 'grinning', 'happy', 'irritated', 'laughing', 'neutral', 'normal', 'sad', 'serious', 'serious2', 'shy', 'skeptical', 'smile', 'smug', 'surprised', 'teasing', 'thinking', 'tired', 'upset', 'worried'] },
-    pia: { name: 'Pia', role: 'Kurir Surat', color: '#6fa3e8', dir: 'assets/characters/pia/', ar: 0.4901, hf: 0.9813, default: 'normal',
+    pia: { name: 'Pia', role: 'Kurir Surat', color: '#6fa3e8', dir: 'assets/characters/pia/', ar: 0.4901, hf: 0.9813, portrait: { x: 0.17, w: 0.56 }, default: 'normal',
       expressions: ['angry', 'angry2', 'angry3', 'angry4', 'confused', 'confused2', 'cry_laugh', 'crying', 'eyes_closed', 'eyes_closed2', 'grin', 'grin2', 'normal', 'normal2', 'oops', 'pale', 'sad', 'sad2', 'sad3', 'sad4', 'smile', 'smile2', 'smug', 'smug2', 'smug3', 'sparkle', 'sparkle2', 'squeeze', 'surprised', 'surprised2', 'troubled', 'unamused', 'unamused2', 'wry', 'wry2'] },
-    sera: { name: 'Sera', role: 'Ketua Klub Elektronika', color: '#b9a7e6', dir: 'assets/characters/sera/', ar: 0.4170, hf: 0.9863, default: 'normal',
+    sera: { name: 'Sera', role: 'Ketua Klub Elektronika', color: '#b9a7e6', dir: 'assets/characters/sera/', ar: 0.4170, hf: 0.9863, portrait: { x: 0.13, w: 0.70 }, default: 'normal',
       expressions: ['angry', 'angry2', 'angry3', 'beaming', 'beaming2', 'cold', 'eh', 'exasperated', 'eyes_closed', 'frustrated_cry', 'hah', 'heart_eyes', 'heart_eyes2', 'hmm', 'huh', 'normal', 'normal2', 'puzzled', 'puzzled2', 'puzzled3', 'recoil', 'recoil2', 'sad', 'sad2', 'smile', 'smile2', 'tch', 'tch2', 'tears', 'tears2', 'tears3', 'wry', 'wry2'] },
     kamu: { name: 'Kamu', color: '#9bd1ff', sprite: false }   // pemain: hanya nameplate, tanpa sprite
   };
