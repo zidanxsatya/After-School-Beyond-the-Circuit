@@ -59,6 +59,15 @@ Object.entries(S).forEach(([id, sc]) => {
 });
 ok(Object.values(S).some(s => s.next === null && s.lines.some(l => l.action === 'evaluation')), 'adegan akhir memanggil evaluasi');
 
+/* 3b. Kedipan: berkas ada, kotak valid, daftar ekspresi hanya berisi ekspresi yang memang ada */
+Object.entries(D.characters).forEach(([cid, c]) => {
+  if (!c.blink) return;
+  ok(fs.existsSync(path.join(root, c.dir + c.blink.file)), cid + ': blink file');
+  ok(c.blink.box.length === 4 && c.blink.box.every(v => v > 0 && v < 1) && c.blink.box[0] + c.blink.box[2] < 1 && c.blink.box[1] + c.blink.box[3] < 1, cid + ': blink box');
+  c.blink.exps.forEach(e => { ok(c.expressions.includes(e), `${cid}: blink exp ${e}`); ok(!/^eyes_closed/.test(e), `${cid}: ${e} sudah bermata tertutup`); });
+  ok(c.blink.exps.includes(c.default), cid + ': ekspresi default harus bisa berkedip');
+});
+
 /* 4. Materi */
 D.materials.forEach(m => m.pages.forEach((p, i) => {
   const who = p.who || m.who, c = D.characters[who];

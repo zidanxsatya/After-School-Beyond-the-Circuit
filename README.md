@@ -63,7 +63,12 @@ s_contoh: { chapter: 'Bab 1', bg: 'hallway', bgm: 'peaceful', next: 'adegan_beri
 4. Pakai di cerita: `rena('nama_ekspresi', '...')`.
 
 Daftar ekspresi yang tersedia ada di `data/assets.js`; asal tiap nama ada di `assets/ASSET_MAP.md`.
-**Berkedip tidak diterapkan:** set sprite yang diberikan berupa gambar utuh per ekspresi, tanpa lapisan mata terpisah, sehingga berkedip tidak bisa dibuat tanpa merusak wajah.
+**Animasi karakter (idle & kedip):**
+- *Idle*: napas (naik-turun ± 3 px) dan goyang halus (± 0,3°) lewat CSS `translate`/`rotate` (tanpa mengubah layout). Tempo dan fase acak per karakter. Mati otomatis bila perangkat memakai "kurangi gerak".
+- *Kedip*: `assets/characters/<id>/blink.webp` adalah kelopak mata tertutup yang dipotong dari sprite `eyes_closed` yang sudah ada, lalu ditempel hanya di area mata (gambar ekspresi tidak diganti, jadi ekspresi tidak pernah kembali ke netral). Interval acak 2,2–6 detik, sesekali kedip ganda.
+- *Hanya ekspresi yang bentuk matanya identik dengan `normal`* yang berkedip (daftar `blink.exps` di `data/assets.js`). Ekspresi lain (kaget, berkaca-kaca, mata sudah tertutup, dsb.) tidak berkedip supaya tidak muncul sisa bola mata.
+- *Menambah ekspresi baru yang bisa berkedip*: pastikan area matanya sama dengan `normal`, lalu tambahkan namanya ke `blink.exps`. Karakter baru: sediakan satu sprite mata tertutup, buat `blink.webp` (sama ukuran koordinat dengan sprite), isi `blink: { file, box, exps }`.
+- Kedip tidak dipakai pada potret kecil di halaman Materi dan pada menu utama (menu hanya memakai idle).
 
 ## Mengganti latar dan musik
 

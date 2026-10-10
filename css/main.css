@@ -40,6 +40,8 @@ code { background: rgba(255,255,255,.12); padding: 0 .3em; border-radius: 4px; }
 .menu-bg::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(27,19,32,.92) 0%, rgba(27,19,32,.7) 34%, rgba(27,19,32,0) 66%); }
 .menu-chars { position: absolute; inset: 0; pointer-events: none; }
 .mc { position: absolute; bottom: -6vh; aspect-ratio: var(--ar); height: min(calc(var(--hf) * 108vh), calc(34vw / var(--ar))); filter: drop-shadow(0 8px 18px rgba(0,0,0,.45)); }
+.mc { will-change: transform; --bamp: 5px; animation: breath 6s ease-in-out infinite, sway 8.5s ease-in-out infinite; transform-origin: 50% 100%; }
+.c-sera { animation-duration: 6.9s, 9.4s; animation-delay: -2s, -4s; } .c-pia { animation-duration: 5.4s, 7.7s; animation-delay: -1s, -6s; }
 .c-sera { right: 19%; height: min(calc(var(--hf) * 98vh), calc(30vw / var(--ar))); z-index: 1; }
 .c-rena { right: 5%; z-index: 2; }
 .c-pia { right: 36%; height: min(calc(var(--hf) * 92vh), calc(28vw / var(--ar))); z-index: 0; }

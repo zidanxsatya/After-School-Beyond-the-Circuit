@@ -4,7 +4,9 @@
   const SR = window.SR = window.SR || {};
   const { fmt, $, $$, wait } = SR.Util;
   const CH = id => SR.data.characters[id];
-  const GUARD_MS = 160;          // abaikan ketukan ganda yang terlalu cepat
+  const GUARD_MS = 160;
+  const mq = window.matchMedia ? matchMedia('(prefers-reduced-motion: reduce)') : null;
+  const REDUCED = !!(mq && mq.matches);       // gerak dikurangi: tanpa idle & kedipan          // abaikan ketukan ganda yang terlalu cepat
 
   let host, el = {}, st = null, busy = false, askActive = false, waiting = false, typing = null, lastAdv = 0, bgFlip = false;
 
@@ -66,15 +68,49 @@
     const ch = CH(id), n = document.createElement('div');
     n.className = 'sprite' + (instant ? '' : ' enter'); n.dataset.id = id;
     n.style.setProperty('--ar', ch.ar); n.style.setProperty('--hf', ch.hf);
-    n.addEventListener('animationend', () => n.classList.remove('enter'), { once: true });
+    n.addEventListener('animationend', e => { if (e.target === n) n.classList.remove('enter'); });
+    // .fig = pembungkus gerak idle (napas + goyang, hanya transform) — gambar & kedipan ikut bergerak bersama
+    const fig = document.createElement('div'); fig.className = 'fig';
+    fig.style.setProperty('--b-dur', (5.2 + Math.random() * 1.8).toFixed(2) + 's');     // tempo tiap karakter berbeda
+    fig.style.setProperty('--s-dur', (7 + Math.random() * 3.2).toFixed(2) + 's');
+    fig.style.setProperty('--b-del', '-' + (Math.random() * 6).toFixed(2) + 's');        // fase acak: tidak serempak
+    fig.style.setProperty('--s-del', '-' + (Math.random() * 9).toFixed(2) + 's');
+    n.appendChild(fig);
+    if (ch.blink && !REDUCED) {
+      const b = new Image(); b.className = 'blink'; b.alt = ''; b.draggable = false; b.src = ch.dir + ch.blink.file;
+      const [l, t, w, h] = ch.blink.box;
+      b.style.cssText = `left:${l * 100}%;top:${t * 100}%;width:${w * 100}%;height:${h * 100}%`;
+      b.addEventListener('animationend', () => n.classList.remove('blinking'));
+      fig.appendChild(b); if (b.decode) b.decode().catch(() => {});
+      scheduleBlink(n, id);
+    }
     el.sprites.appendChild(n);
     return n;
+  }
+
+  /* ---------- kedipan: hanya menempelkan kelopak tertutup di area mata; gambar ekspresi TIDAK diganti ---------- */
+  function scheduleBlink(n, id) {
+    clearTimeout(n._bt);
+    n._bt = setTimeout(() => {
+      if (!n.isConnected || n.classList.contains('leaving')) return;          // sprite sudah dihapus: berhenti
+      const cur = n.querySelector('img.cur'), ch = CH(id);
+      if (!document.hidden && cur && ch.blink.exps.includes(cur.dataset.exp) && !n.classList.contains('enter')) {
+        blinkOnce(n);
+        if (Math.random() < 0.18) setTimeout(() => n.isConnected && blinkOnce(n), 260);   // sesekali kedip ganda
+      }
+      scheduleBlink(n, id);
+    }, 2200 + Math.random() * 3800);                                              // interval 2,2–6 detik, tidak tetap
+  }
+  function blinkOnce(n) {
+    n.classList.remove('blinking');
+    requestAnimationFrame(() => n.classList.add('blinking'));
   }
 
   function setExpImg(n, id, exp, instant) {
     const cur = n.querySelector('img.cur');
     if (cur && cur.dataset.exp === exp) { n.dataset.want = exp; return; }
     n.dataset.want = exp;
+    n.classList.remove('blinking');                    // ganti ekspresi: batalkan kedipan yang sedang berjalan
     const it = SR.Sprites.get(id, exp);           // dari cache bila sudah dipanaskan
     const attach = () => {
       if (n.dataset.want !== exp || !n.isConnected) return;   // sudah diganti ekspresi lain
@@ -82,7 +118,7 @@
       const img = it.img.cloneNode(false);
       img.className = 'cur'; img.alt = ''; img.draggable = false; img.dataset.exp = exp;
       if (prev) { prev.classList.remove('cur'); prev.classList.add('old'); }
-      n.appendChild(img);
+      n.querySelector('.fig').insertBefore(img, n.querySelector('.blink'));   // gambar ekspresi selalu di bawah tempelan kedip
       requestAnimationFrame(() => img.classList.add('in'));
       setTimeout(() => $$('img.old', n).forEach(o => o.remove()), instant ? 0 : 180);
     };
@@ -91,7 +127,7 @@
 
   function renderSprites(instant) {
     $$('.sprite:not(.leaving)', el.sprites).forEach(n => {
-      if (!st.sprites[n.dataset.id]) { n.classList.add('leaving'); setTimeout(() => n.remove(), instant ? 0 : 320); }
+      if (!st.sprites[n.dataset.id]) { clearTimeout(n._bt); n.classList.add('leaving'); setTimeout(() => n.remove(), instant ? 0 : 320); }
     });
     Object.keys(st.sprites).forEach(id => {
       const s = st.sprites[id];

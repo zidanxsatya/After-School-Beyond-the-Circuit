@@ -17,8 +17,20 @@
 .sprite.dim { z-index: 1; filter: brightness(.72); }       /* tanpa transisi/drop-shadow: filter pada gambar sebesar layar mahal di HP */
 .sprite.enter { animation: spriteIn .35s ease both; }
 .sprite.leaving { opacity: 0; }
-.sprite img { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity .14s linear; -webkit-user-drag: none; }
+.sprite img:not(.blink) { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; transition: opacity .14s linear; -webkit-user-drag: none; }
 .sprite img.in, .sprite img.old { opacity: 1; }
+
+/* idle: napas (naik-turun) + goyang halus. Hanya properti compositor (translate/rotate) -> tidak menggeser layout/kotak dialog.
+   Dua animasi berperiode berbeda (dan fase acak per sprite) sehingga gerakannya tidak mekanis. Gambar utama tidak diskalakan. */
+.sprite .fig { position: absolute; inset: 0; transform-origin: 50% 100%; will-change: transform;
+  animation: breath var(--b-dur, 5.8s) ease-in-out var(--b-del, 0s) infinite, sway var(--s-dur, 8.3s) ease-in-out var(--s-del, 0s) infinite; }
+@keyframes breath { 0%, 100% { translate: 0 0; } 50% { translate: 0 calc(var(--bamp, .55cqh) * -1); } }
+@keyframes sway { 0%, 100% { rotate: -.28deg; } 50% { rotate: .28deg; } }
+
+/* kedipan: kelopak tertutup ditempel di atas mata saja (opacity), menutup cepat & membuka sedikit lebih lambat */
+.sprite img.blink { position: absolute; opacity: 0; pointer-events: none; -webkit-user-drag: none; }
+.sprite.blinking img.blink { animation: blink .17s ease-in-out; }
+@keyframes blink { 0% { opacity: 0; } 35% { opacity: 1; } 55% { opacity: 1; } 100% { opacity: 0; } }
 @keyframes spriteIn { from { opacity: 0; transform: translateX(calc(var(--x) * 1cqw - 50%)) translateY(18px); } }
 
 /* HUD */
