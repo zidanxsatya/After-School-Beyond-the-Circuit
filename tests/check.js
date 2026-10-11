@@ -3,7 +3,7 @@
 const fs = require('fs'), path = require('path'), assert = require('assert');
 global.window = global;
 const root = path.join(__dirname, '..');
-['js/util', 'data/assets', 'data/story', 'data/materials', 'data/questions', 'js/logic', 'js/symbols', 'js/settings', 'js/progress', 'js/evaluation']
+['js/util', 'data/assets', 'data/wind', 'data/story', 'data/materials', 'data/questions', 'js/logic', 'js/symbols', 'js/settings', 'js/progress', 'js/evaluation']
   .forEach(f => require(path.join(root, f + '.js')));
 const L = SR.Logic, D = SR.data;
 let n = 0; const ok = (c, m) => { assert(c, m); n++; };
@@ -66,6 +66,18 @@ Object.entries(D.characters).forEach(([cid, c]) => {
   ok(c.blink.box.length === 4 && c.blink.box.every(v => v > 0 && v < 1) && c.blink.box[0] + c.blink.box[2] < 1 && c.blink.box[1] + c.blink.box[3] < 1, cid + ': blink box');
   c.blink.exps.forEach(e => { ok(c.expressions.includes(e), `${cid}: blink exp ${e}`); ok(!/^eyes_closed/.test(e), `${cid}: ${e} sudah bermata tertutup`); });
   ok(c.blink.exps.includes(c.default), cid + ': ekspresi default harus bisa berkedip');
+});
+
+/* 3c. Angin pada rambut (data/wind.js) */
+Object.entries(D.wind).forEach(([cid, w]) => {
+  ok(D.characters[cid] && D.characters[cid].blink, cid + ': karakter angin harus ada');
+  w.zones.forEach(z => {
+    const [l, t, bw, bh] = z.box;
+    ok(l >= 0 && t >= 0 && bw > 0 && bh > 0 && l + bw <= 1.0001 && t + bh <= 1.0001, `${cid}/${z.id}: box`);
+    ok(/^data:image\/png;base64,/.test(z.mask), `${cid}/${z.id}: mask`);
+    ok(['A', 'B', 'C'].includes(z.key), `${cid}/${z.id}: key`);
+    ok(Math.abs(z.amp) <= 3 && z.dur >= 6 && z.pivot.every(v => v >= -0.6 && v <= 1.6), `${cid}/${z.id}: amplitudo kecil, durasi lambat`);
+  });
 });
 
 /* 4. Materi */

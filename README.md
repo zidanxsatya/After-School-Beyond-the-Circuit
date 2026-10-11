@@ -69,6 +69,9 @@ Daftar ekspresi yang tersedia ada di `data/assets.js`; asal tiap nama ada di `as
 - *Hanya ekspresi yang bentuk matanya identik dengan `normal`* yang berkedip (daftar `blink.exps` di `data/assets.js`). Ekspresi lain (kaget, berkaca-kaca, mata sudah tertutup, dsb.) tidak berkedip supaya tidak muncul sisa bola mata.
 - *Menambah ekspresi baru yang bisa berkedip*: pastikan area matanya sama dengan `normal`, lalu tambahkan namanya ke `blink.exps`. Karakter baru: sediakan satu sprite mata tertutup, buat `blink.webp` (sama ukuran koordinat dengan sprite), isi `blink: { file, box, exps }`.
 - Kedip tidak dipakai pada potret kecil di halaman Materi dan pada menu utama (menu hanya memakai idle).
+- *Angin pada rambut* (`data/wind.js`, hanya Rena dan Sera): kuncir Rena serta rambut panjang dan antena Sera berputar sangat kecil (≤ 0,7°; antena ≤ 2,4°) dengan pola, durasi (9–14 detik), dan fase berbeda per bagian (ada jeda dan sesekali berbalik arah). Tubuh dan wajah tidak ikut bergerak. Cara kerja: gambar dasar karakter ini digambar ke `<canvas>` dengan area rambut dihapus, lalu potongan sprite yang sama (mask yang sama, dicampur additif) berputar di atas area itu. Keadaan diam identik dengan sprite asli. Pia tidak punya bagian yang menggantung bebas di atas latar transparan, jadi tidak dianimasikan (menggerakkan rambut pendek yang menempel di leher akan merusak gambar).
+- Penyetel ketajaman: `WIND_K` di `js/dialogue.js` (skala bitmap canvas; 1,3 dipilih agar ketajaman setara karakter lain, ±4%). Jangan diubah kecuali gambar terlihat lebih lembut/lebih tajam daripada Pia.
+- Membuat zona baru: tentukan poligon bagian yang menggantung bebas (bukan menumpuk badan), titik akar (pivot), dan hitung peta bobot — lihat komentar di `data/wind.js`. Bagian yang bertumpuk dengan badan/wajah sebaiknya tidak dianimasikan (akan tampak sobek atau dobel).
 
 ## Mengganti latar dan musik
 

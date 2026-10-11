@@ -84,8 +84,60 @@
       fig.appendChild(b); if (b.decode) b.decode().catch(() => {});
       scheduleBlink(n, id);
     }
+    // Angin halus (data/wind.js): hanya rambut yang menggantung bebas. Gambar dasar karakter ini digambar ke <canvas> dengan area zona
+    // dihapus; potongan sprite yang sama (lapisan .wz, mask yang sama, dicampur additif) berputar sangat kecil di atasnya.
+    // Saat diam hasilnya identik dengan sprite asli; tubuh & wajah tidak ikut bergerak.
+    const wd = SR.data.wind && SR.data.wind[id];
+    if (wd && !REDUCED) {
+      fig.classList.add('wind');
+      const cv = document.createElement('canvas'); cv.className = 'basec'; fig.insertBefore(cv, fig.firstChild);
+      if (window.ResizeObserver) new ResizeObserver(() => { if (n.dataset.exp) drawWind(n, id, n.dataset.exp); }).observe(cv);
+      wd.zones.forEach(z => {
+        const [l, t, w, h] = z.box, w_ = document.createElement('div');
+        w_.className = 'wz wz-' + z.key;
+        w_.style.cssText = `left:${l * 100}%;top:${t * 100}%;width:${w * 100}%;height:${h * 100}%;` +
+          `transform-origin:${z.pivot[0] * 100}% ${z.pivot[1] * 100}%;--amp:${z.amp}deg;animation-duration:${z.dur}s;animation-delay:${z.delay}s;` +
+          `background-size:${100 / w}% ${100 / h}%;background-position:${w < 1 ? l / (1 - w) * 100 : 0}% ${h < 1 ? t / (1 - h) * 100 : 0}%;` +
+          `-webkit-mask-image:url("${z.mask}");mask-image:url("${z.mask}")`;
+        fig.appendChild(w_);
+      });
+    }
     el.sprites.appendChild(n);
     return n;
+  }
+
+  /* ---------- gambar dasar via canvas (hanya karakter ber-angin) ---------- */
+  const WIND_K = 1.3;                     // skala bitmap canvas terhadap piksel layar (penyetel ketajaman, lihat README)
+  const maskCache = {};
+  function windReady(id) {                // mask zona didekode sekali per karakter
+    if (!maskCache[id]) {
+      const imgs = SR.data.wind[id].zones.map(z => { const i = new Image(); i.src = z.mask; return i; });
+      maskCache[id] = { imgs, p: Promise.all(imgs.map(i => (i.decode ? i.decode() : Promise.resolve()).catch(() => {}))) };
+    }
+    return maskCache[id];
+  }
+  function drawWind(n, id, exp) {
+    const c = n.querySelector('canvas.basec'), it = SR.Sprites.get(id, exp), m = maskCache[id];
+    if (!c || !c.clientWidth || !it.ready || !m) return;
+    const k = (window.devicePixelRatio || 1) * WIND_K, w = Math.round(c.clientWidth * k), h = Math.round(c.clientHeight * k);
+    if (c.width !== w || c.height !== h) { c.width = w; c.height = h; }
+    const g = c.getContext('2d');
+    g.globalCompositeOperation = 'source-over'; g.clearRect(0, 0, w, h);
+    g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high';
+    g.drawImage(it.img, 0, 0, w, h);
+    g.globalCompositeOperation = 'destination-out';
+    SR.data.wind[id].zones.forEach((z, i) => { if (m.imgs[i].naturalWidth) g.drawImage(m.imgs[i], z.box[0] * w, z.box[1] * h, z.box[2] * w, z.box[3] * h); });
+    g.globalCompositeOperation = 'source-over';
+  }
+  function setWindBase(n, id, exp) {
+    n.dataset.want = exp; n.classList.remove('blinking');
+    const it = SR.Sprites.get(id, exp), m = windReady(id);
+    const go = () => {
+      if (n.dataset.want !== exp || !n.isConnected) return;
+      n.dataset.exp = exp; drawWind(n, id, exp);
+      n.querySelectorAll('.wz').forEach(z => { z.style.backgroundImage = `url("${SR.Sprites.url(id, exp)}")`; });
+    };
+    if (it.ready && m.imgs.every(i => i.complete)) go(); else Promise.all([it.p, m.p]).then(go);
   }
 
   /* ---------- kedipan: hanya menempelkan kelopak tertutup di area mata; gambar ekspresi TIDAK diganti ---------- */
@@ -93,8 +145,8 @@
     clearTimeout(n._bt);
     n._bt = setTimeout(() => {
       if (!n.isConnected || n.classList.contains('leaving')) return;          // sprite sudah dihapus: berhenti
-      const cur = n.querySelector('img.cur'), ch = CH(id);
-      if (!document.hidden && cur && ch.blink.exps.includes(cur.dataset.exp) && !n.classList.contains('enter')) {
+      const ch = CH(id);
+      if (!document.hidden && n.dataset.exp && ch.blink.exps.includes(n.dataset.exp) && !n.classList.contains('enter')) {
         blinkOnce(n);
         if (Math.random() < 0.18) setTimeout(() => n.isConnected && blinkOnce(n), 260);   // sesekali kedip ganda
       }
@@ -107,6 +159,7 @@
   }
 
   function setExpImg(n, id, exp, instant) {
+    if (n.querySelector('canvas.basec')) return setWindBase(n, id, exp);
     const cur = n.querySelector('img.cur');
     if (cur && cur.dataset.exp === exp) { n.dataset.want = exp; return; }
     n.dataset.want = exp;
@@ -119,6 +172,7 @@
       img.className = 'cur'; img.alt = ''; img.draggable = false; img.dataset.exp = exp;
       if (prev) { prev.classList.remove('cur'); prev.classList.add('old'); }
       n.querySelector('.fig').insertBefore(img, n.querySelector('.blink'));   // gambar ekspresi selalu di bawah tempelan kedip
+      n.dataset.exp = exp;
       requestAnimationFrame(() => img.classList.add('in'));
       setTimeout(() => $$('img.old', n).forEach(o => o.remove()), instant ? 0 : 180);
     };
@@ -151,11 +205,12 @@
   }
 
   /* ---------- pemanasan (preload) sprite & latar yang segera dipakai ---------- */
+  const warmWind = id => { if (!REDUCED && SR.data.wind && SR.data.wind[id]) windReady(id); };   // mask angin didekode lebih dulu
   function warmLines(lines, from, count) {
     for (let j = from; j < Math.min(lines.length, from + count); j++) {
       const l = lines[j]; if (!l) break;
-      if (l.who) SR.Sprites.preload(l.who, l.exp);
-      (l.show || []).forEach(s => SR.Sprites.preload(s.id, s.exp));
+      if (l.who) { SR.Sprites.preload(l.who, l.exp); warmWind(l.who); }
+      (l.show || []).forEach(s => { SR.Sprites.preload(s.id, s.exp); warmWind(s.id); });
       if (l.action === 'ask') { SR.Sprites.preload(l.who, l.right.exp); SR.Sprites.preload(l.who, l.wrong.exp); }
       if (l.bg) SR.Sprites.preloadBg(l.bg);
       if (l.action === 'material') {                       // potret halaman pertama materi yang akan dibuka
@@ -226,6 +281,7 @@
     if (!sc) throw new Error('Adegan tidak ditemukan: ' + id);
     busy = true; st.scene = sc; st.sceneId = id; st.idx = 0;
     const silent = resumeIdx != null;
+    warmLines(sc.lines, 0, 4);                       // sprite & mask baris awal dipanaskan selama transisi/kartu judul
     const newPlace = !st.bg || sc.bg !== st.bg;       // suara transisi hanya saat tempat berganti
     if (!silent) { await fadeTo(1, 250); if (newPlace) SR.Audio.ui('scene'); }
     resetStage();
